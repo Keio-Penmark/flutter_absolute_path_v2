@@ -2,17 +2,21 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
+/// This class provides utility methods to get absolute paths from URIs or asset IDs.
 class FlutterAbsolutePath {
   static const MethodChannel _channel =
       const MethodChannel('flutter_absolute_path');
 
-  /// Gets absolute path of the file from android URI or iOS PHAsset identifier
-  /// The return of this method can be used directly with flutter [File] class
+  /// Returns the absolute file path for the given URI or asset ID.
+  ///
+  /// The return value can be used directly with the flutter [File] class.
   static Future<String> getAbsolutePath(String uri) async {
-    final Map<String, dynamic> params = <String, dynamic>{
-      'uri': uri,
-    };
-    final String path = await _channel.invokeMethod('getAbsolutePath', params);
-    return path;
+    try {
+      final String path =
+          await _channel.invokeMethod('getAbsolutePath', {'uri': uri});
+      return path;
+    } on PlatformException catch (e) {
+      throw 'Failed to get absolute path: $e';
+    }
   }
 }
